@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="skot.sensormadness.MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true">
+
+        <TextView
+            android:id="@+id/sensorDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NOTHING TO DISPLAY" />
+
+        <skot.sensormadness.GraphView
+            android:id="@+id/graphView0"
+            android:layout_width="match_parent"
+            android:layout_height="75sp"
+            android:layout_below="@+id/sensorDisplay"
+            android:layout_margin="5sp" />
+
+        <skot.sensormadness.GraphView
+            android:id="@+id/graphView1"
+            android:layout_width="match_parent"
+            android:layout_height="75sp"
+            android:layout_below="@+id/graphView0"
+            android:layout_margin="5sp" />
+
+        <skot.sensormadness.GraphView
+            android:id="@+id/graphView2"
+            android:layout_width="match_parent"
+            android:layout_height="75sp"
+            android:layout_below="@+id/graphView1"
+            android:layout_margin="5sp" />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
