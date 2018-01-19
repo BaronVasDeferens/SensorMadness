@@ -23,10 +23,16 @@ public class SensorReader implements SensorEventListener {
         this.mySensor = mySensor;
         this.handler = handler;
 
-        sensorManager.registerListener(this, mySensor, SensorManager.SENSOR_DELAY_FASTEST);
-//        sensorManager.registerListener(this, mySensor, SensorManager.SENSOR_DELAY_NORMAL);
+        startUp();
     }
 
+    public void startUp() {
+        sensorManager.registerListener(this, mySensor, SensorManager.SENSOR_DELAY_FASTEST);
+    }
+
+    public void shutDown() {
+        sensorManager.unregisterListener(this);
+    }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -40,7 +46,5 @@ public class SensorReader implements SensorEventListener {
 
     }
 
-    public void shutDown() {
-        sensorManager.unregisterListener(this);
-    }
+
 }
