@@ -21,4 +21,8 @@ public class Launcher extends AppCompatActivity {
     public void launchMicRecorder(View v) {
         startActivity(new Intent(this, MicRecorder.class));
     }
+
+    public void launchExample(View view) {
+        startActivity(new Intent(this, Main2Activity.class));
+    }
 }
