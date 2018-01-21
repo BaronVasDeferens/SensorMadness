@@ -20,9 +20,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TiltTone" />
-        <activity android:name=".MicRecorder" />
-        <activity android:name=".Main2Activity"></activity>
+        <activity android:name=".TiltTone"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation"/>
+        <activity android:name=".LoopRecorderActivity"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation"/>
     </application>
 
 </manifest>

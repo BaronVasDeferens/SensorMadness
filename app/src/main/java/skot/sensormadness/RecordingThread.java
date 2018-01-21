@@ -38,7 +38,7 @@ public class RecordingThread extends Thread {
         audioRecord.startRecording();
         int bytesRead = 0;
         while (nowRecording) {
-            bytesRead += audioRecord.read(buffer, 0, bufferSize);
+            bytesRead = audioRecord.read(buffer, 0, bufferSize);
         }
 
         System.out.println(">>> " + bytesRead + " bytes read");

@@ -1,33 +1,26 @@
 package skot.sensormadness;
 
 import android.graphics.Color;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioRecord;
-import android.media.AudioTrack;
-import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 
-import java.io.IOException;
-
-public class MicRecorder extends AppCompatActivity {
+public class LoopRecorderActivity extends AppCompatActivity {
 
 
     Button playStart, playStop, recStart, recStop;
     RecordingThread recThread = null;
     SoundPlayer soundPlayer = null;
-    private final int sampleRate = 44100;
-    private final int bufferSize = 100000;
+    private final int sampleRate = 22050;
+    private final int bufferSize = 50000;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mic_recorder);
+        setContentView(R.layout.activity_loop_recorder);
 
         recStart = (Button) findViewById(R.id.btnRecordSound);
         enableButton(recStart);
@@ -98,18 +91,11 @@ public class MicRecorder extends AppCompatActivity {
         b.setBackgroundColor(Color.RED);
     }
 
-    private class RecordingTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void nada) {
-
-        }
+    public void setPlaybackLoopMode(View view) {
+        CheckBox checkbox = (CheckBox) view;
+        if (checkbox.isChecked())
+            soundPlayer.setToLoop();
+        else
+            soundPlayer.setToOneshot();
     }
 }
