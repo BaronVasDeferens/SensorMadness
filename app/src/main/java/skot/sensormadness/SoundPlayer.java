@@ -3,19 +3,23 @@ package skot.sensormadness;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
 /**
  * Created by skot on 1/20/18.
  */
 
-public class SoundPlayer extends Thread implements AudioTrack.OnPlaybackPositionUpdateListener {
+public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener {
 
     private byte[] buffer;
     private int sampleRate;
     private AudioTrack audioTrack = null;
+    private PlaybackCompleteListener listener;
 
-    public SoundPlayer(final byte [] buffer, final int sampleRate) {
-
+    public SoundPlayer(final PlaybackCompleteListener listener, final byte[] buffer, final int sampleRate) {
+        this.listener = listener;
         this.sampleRate = sampleRate;
         this.buffer = buffer;
 
@@ -30,14 +34,22 @@ public class SoundPlayer extends Thread implements AudioTrack.OnPlaybackPosition
         audioTrack.setPlaybackPositionUpdateListener(this);
     }
 
-    public void run() {
+    public void init() {
         audioTrack.write(buffer, 0, buffer.length);
+        audioTrack.setPlaybackHeadPosition(0);
         audioTrack.setNotificationMarkerPosition(buffer.length);
+    }
+
+    public void playSound() {
+        if (audioTrack.getPlaybackHeadPosition() > 0) {
+            audioTrack.stop();
+            audioTrack.setPlaybackHeadPosition(0);
+        }
+
         audioTrack.play();
     }
 
     public void setToLoop() {
-        audioTrack.pause();
         System.out.println(">>> SET TO LOOP");
         audioTrack.setLoopPoints(0, buffer.length, -1);
     }
@@ -55,11 +67,15 @@ public class SoundPlayer extends Thread implements AudioTrack.OnPlaybackPosition
     @Override
     public void onMarkerReached(AudioTrack audioTrack) {
         System.out.println(">>> MARKER!!!!");
+        audioTrack.stop();
+        listener.onPlaybackComplete();
     }
 
     @Override
     public void onPeriodicNotification(AudioTrack audioTrack) {
 
     }
+
+
 }
 

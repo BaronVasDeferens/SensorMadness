@@ -1,13 +1,37 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="skot.sensormadness.LoopTrack">
+    android:layout_height="wrap_content"
+    tools:context="skot.sensormadness.LoopTrackFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="100sp"
+        android:background="@color/colorAccent"
+        android:visibility="visible"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/recButton"
+            android:layout_width="75sp"
+            android:layout_height="75sp"
+            android:layout_margin="10sp"
+            android:background="@color/colorPrimary"
+            android:text="REC"
+            android:tag="recButton"/>
+
+        <Button
+            android:id="@+id/playButton"
+            android:layout_width="75sp"
+            android:layout_height="75sp"
+            android:layout_margin="10sp"
+            android:background="@color/colorPrimary"
+            android:text="PLAY"
+            android:tag="playButton"/>
+
+    </LinearLayout>
+
+
 
 </FrameLayout>

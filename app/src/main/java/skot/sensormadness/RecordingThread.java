@@ -9,6 +9,7 @@ import android.media.MediaRecorder;
  */
 
 public class RecordingThread extends Thread {
+    private AudioRecord audioRecord;
     private boolean nowRecording = false;
     byte [] buffer;
     private final int bufferSize;
@@ -18,15 +19,21 @@ public class RecordingThread extends Thread {
         this.sampleRate = sampleRate;
         this.bufferSize = bufferSize;
 
-
-        System.out.println(">>> sampleRate : " + sampleRate);
-        System.out.println(">>> bufferSize : " + bufferSize);
+        buffer = new byte [bufferSize];
+//         audioRecord = new AudioRecord(
+//                MediaRecorder.AudioSource.MIC,
+//                sampleRate,
+//                AudioFormat.CHANNEL_IN_MONO,
+//                AudioFormat.ENCODING_PCM_8BIT,
+//                bufferSize
+//        );
     }
 
     public void run() {
+
         System.out.println(">>> (REC) Start...");
-        buffer = new byte [bufferSize];
-        AudioRecord audioRecord = new AudioRecord(
+
+        audioRecord = new AudioRecord(
                 MediaRecorder.AudioSource.MIC,
                 sampleRate,
                 AudioFormat.CHANNEL_IN_MONO,

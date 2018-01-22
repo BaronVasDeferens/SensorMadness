@@ -1,101 +1,41 @@
 package skot.sensormadness;
 
+import android.app.Fragment;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 
-public class LoopRecorderActivity extends AppCompatActivity {
+public class LoopRecorderActivity extends AppCompatActivity implements LoopTrackFragment.OnFragmentInteractionListener {
 
-
-    Button playStart, playStop, recStart, recStop;
-    RecordingThread recThread = null;
-    SoundPlayer soundPlayer = null;
-    private final int sampleRate = 22050;
-    private final int bufferSize = 50000;
-
+    LoopTrackFragment trackOne, trackTwo, trackThree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loop_recorder);
 
-        recStart = (Button) findViewById(R.id.btnRecordSound);
-        enableButton(recStart);
+        trackOne = new LoopTrackFragment();
+//        trackTwo = new LoopTrackFragment();
+//        trackThree = new LoopTrackFragment();
 
-        recStop = (Button) findViewById(R.id.btnRecStop);
-        disableButton(recStop);
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        android.support.v4.app.FragmentTransaction trans = fragmentManager.beginTransaction();
+        trans.add(R.id.mainLayout, trackOne);
+//        trans.add(R.id.mainLayout, trackTwo);
+//        trans.add(R.id.mainLayout, trackThree);
 
-        playStart = (Button) findViewById(R.id.btnPlaySound);
-        disableButton(playStart);
-
-        playStop = (Button) findViewById(R.id.btnPlayStop);
-        disableButton(playStop);
-
+        trans.commit();
     }
 
-    public void recStart(View view) {
+    @Override
+    public void onFragmentInteraction(Uri uri) {
 
-        disableButton(recStart);
-        enableButton(recStop);
-        disableButton(playStart);
-        disableButton(playStop);
-
-        recThread = new RecordingThread(bufferSize, sampleRate);
-        recThread.start();
-
-    }
-
-    public void recStop(View view) {
-
-        enableButton(recStart);
-        disableButton(recStop);
-        enableButton(playStart);
-        disableButton(playStop);
-
-        if (recThread != null) {
-            recThread.stopRecording();
-        }
-    }
-
-    public void playStart(View view) {
-        enableButton(playStop);
-        disableButton(playStart);
-        disableButton(recStart);
-        disableButton(recStop);
-
-        soundPlayer = new SoundPlayer(recThread.getBuffer(), sampleRate);
-        soundPlayer.start();
-    }
-
-    public void playStop(View view) {
-        enableButton(recStart);
-        disableButton(recStop);
-        enableButton(playStart);
-        disableButton(playStop);
-
-        if (soundPlayer != null)
-            soundPlayer.stopPlaying();
-
-    }
-
-    private void enableButton(final Button b) {
-        b.setClickable(true);
-        b.setBackgroundColor(Color.GREEN);
-    }
-
-    private void disableButton(final Button b) {
-        b.setClickable(false);
-        b.setBackgroundColor(Color.RED);
-    }
-
-    public void setPlaybackLoopMode(View view) {
-        CheckBox checkbox = (CheckBox) view;
-        if (checkbox.isChecked())
-            soundPlayer.setToLoop();
-        else
-            soundPlayer.setToOneshot();
     }
 }
