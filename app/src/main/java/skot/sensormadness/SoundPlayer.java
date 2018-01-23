@@ -3,9 +3,6 @@ package skot.sensormadness;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 
 /**
  * Created by skot on 1/20/18.
@@ -38,6 +35,11 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
         audioTrack.write(buffer, 0, buffer.length);
         audioTrack.setPlaybackHeadPosition(0);
         audioTrack.setNotificationMarkerPosition(buffer.length);
+    }
+
+    public synchronized void setPlaybackRate(int percent) {
+        sampleRate = (int)(44100 * ((float) percent / 100f));
+        audioTrack.setPlaybackRate(sampleRate);
     }
 
     public void playSound() {

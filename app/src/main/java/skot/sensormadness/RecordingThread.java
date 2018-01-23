@@ -14,19 +14,16 @@ public class RecordingThread extends Thread {
     byte [] buffer;
     private final int bufferSize;
     private final int sampleRate;
+    private long recordingStart, recordingStop, recordingDuration = 0;
 
     public RecordingThread(final int bufferSize, final int sampleRate) {
         this.sampleRate = sampleRate;
         this.bufferSize = bufferSize;
 
         buffer = new byte [bufferSize];
-//         audioRecord = new AudioRecord(
-//                MediaRecorder.AudioSource.MIC,
-//                sampleRate,
-//                AudioFormat.CHANNEL_IN_MONO,
-//                AudioFormat.ENCODING_PCM_8BIT,
-//                bufferSize
-//        );
+        for (int i = 0; i < bufferSize; i++) {
+            buffer[i] = 0;
+        }
     }
 
     public void run() {
@@ -42,6 +39,7 @@ public class RecordingThread extends Thread {
         );
 
         nowRecording = true;
+        recordingStart = System.currentTimeMillis();
         audioRecord.startRecording();
         int bytesRead = 0;
         while (nowRecording) {
@@ -49,7 +47,9 @@ public class RecordingThread extends Thread {
         }
 
         System.out.println(">>> " + bytesRead + " bytes read");
-
+        recordingStop = System.currentTimeMillis();
+        recordingDuration = recordingStop - recordingStart;
+        System.out.println(">>> recordingDuration = " + recordingDuration);
         audioRecord.stop();
         audioRecord.release();
     }

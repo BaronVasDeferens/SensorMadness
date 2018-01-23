@@ -22,16 +22,21 @@ public class LoopRecorderActivity extends AppCompatActivity implements LoopTrack
         setContentView(R.layout.activity_loop_recorder);
 
         trackOne = new LoopTrackFragment();
-//        trackTwo = new LoopTrackFragment();
-//        trackThree = new LoopTrackFragment();
+        trackTwo = new LoopTrackFragment();
+        trackThree = new LoopTrackFragment();
 
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction trans = fragmentManager.beginTransaction();
         trans.add(R.id.mainLayout, trackOne);
-//        trans.add(R.id.mainLayout, trackTwo);
-//        trans.add(R.id.mainLayout, trackThree);
+        trans.add(R.id.mainLayout, trackTwo);
+        trans.add(R.id.mainLayout, trackThree);
 
         trans.commit();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override

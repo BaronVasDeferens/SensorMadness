@@ -6,5 +6,5 @@ package skot.sensormadness;
 
 public interface PlaybackCompleteListener {
 
-    public void onPlaybackComplete();
+    void onPlaybackComplete();
 }

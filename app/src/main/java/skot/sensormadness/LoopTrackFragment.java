@@ -8,11 +8,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.SeekBar;
+
+import static android.content.Context.VIBRATOR_SERVICE;
 
 
 /**
@@ -26,7 +30,9 @@ import android.widget.Button;
 public class LoopTrackFragment
         extends android.support.v4.app.Fragment
         implements View.OnClickListener,
-PlaybackCompleteListener{
+        PlaybackCompleteListener, SeekBar.OnSeekBarChangeListener
+
+{
 
     public static final int EVENT_STOPPED_PLAYING = 1;
 
@@ -39,6 +45,7 @@ PlaybackCompleteListener{
     private final int bufferSize = 50000;
 
     Button recButton, playButton;
+    SeekBar speedAdjust;
     private boolean nowRecording = false;
     private boolean nowPlaying = false;
 
@@ -105,6 +112,8 @@ PlaybackCompleteListener{
         recButton.setOnClickListener(this);
         playButton = (Button) getView().findViewById(R.id.playButton);
         playButton.setOnClickListener(this);
+        speedAdjust = (SeekBar) getView().findViewById(R.id.speedAdjust);
+        speedAdjust.setOnSeekBarChangeListener(this);
     }
 
 
@@ -155,6 +164,11 @@ PlaybackCompleteListener{
 
     }
 
+    private void vibrate() {
+        Vibrator steelyDan = (Vibrator) getActivity().getSystemService(VIBRATOR_SERVICE);
+        steelyDan.vibrate(200);
+    }
+
     private void controlRecording() {
 
         if ((!nowRecording) && (!nowPlaying)) {
@@ -163,12 +177,14 @@ PlaybackCompleteListener{
             nowRecording = true;
             recThread = new RecordingThread(bufferSize, sampleRate);
             recThread.start();
+            vibrate();
         } else if (!nowPlaying) {
             recButton.setBackgroundColor(Color.BLUE);
             playButton.setBackgroundColor(Color.BLUE);
             nowRecording = false;
             recThread.stopRecording();
             soundPlayer = null;
+            vibrate();
         }
     }
 
@@ -190,6 +206,7 @@ PlaybackCompleteListener{
             recButton.setBackgroundColor(Color.GRAY);
             playButton.setBackgroundColor(Color.RED);
             soundPlayer.playSound();
+            vibrate();
         }
     }
 
@@ -197,6 +214,22 @@ PlaybackCompleteListener{
     public void onPlaybackComplete() {
         nowPlaying = false;
         playButton.setBackgroundColor(Color.BLUE);
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        if (soundPlayer != null)
+            soundPlayer.setPlaybackRate(i);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 
 
