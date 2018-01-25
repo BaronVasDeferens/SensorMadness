@@ -30,21 +30,52 @@
             android:text="PLAY"
             android:tag="playButton"/>
 
-        <Switch
-            android:id="@+id/swhLoop"
-            android:text="LOOP"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hapticFeedbackEnabled="true"/>
-
         <SeekBar
             android:layout_width="300sp"
             android:layout_height="50sp"
+            android:layout_margin="10sp"
             android:id="@+id/speedAdjust"
             android:tag="speedAdjust"
             android:background="@color/colorPrimary"
-
+            android:progress="50"
+            android:max="100"
             />
+
+        <Switch
+            android:id="@+id/loopSwitch"
+            android:tag="loopSwitch"
+            android:text="LOOP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:textColorHighlight="@color/colorPrimaryDark"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/loopMarkers">
+
+            <EditText
+
+                android:id="@+id/loopStart"
+                android:text="0"
+                android:inputType="number"
+                android:layout_width="50sp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10sp"
+                android:background="@color/white"
+/>
+            <EditText
+                android:id="@+id/loopEnd"
+                android:inputType="number"
+                android:text="50000"
+                android:layout_width="50sp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10sp"
+                android:background="@color/white"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

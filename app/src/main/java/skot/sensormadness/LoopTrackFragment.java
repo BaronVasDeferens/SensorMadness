@@ -3,6 +3,7 @@ package skot.sensormadness;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Color;
+import android.media.PlaybackParams;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,10 +12,13 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Switch;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
@@ -29,8 +33,8 @@ import static android.content.Context.VIBRATOR_SERVICE;
  */
 public class LoopTrackFragment
         extends android.support.v4.app.Fragment
-        implements View.OnClickListener,
-        PlaybackCompleteListener, SeekBar.OnSeekBarChangeListener
+        implements View.OnTouchListener,
+        PlaybackCompleteListener, SeekBar.OnSeekBarChangeListener, View.OnLongClickListener
 
 {
 
@@ -45,9 +49,12 @@ public class LoopTrackFragment
     private final int bufferSize = 50000;
 
     Button recButton, playButton;
+    Switch loopSwitch;
     SeekBar speedAdjust;
+    EditText startLoop, stopLoop;
     private boolean nowRecording = false;
     private boolean nowPlaying = false;
+    private boolean isLoopMode = false;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -109,11 +116,18 @@ public class LoopTrackFragment
     public void onViewCreated(View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
         recButton = (Button) getView().findViewById(R.id.recButton);
-        recButton.setOnClickListener(this);
+        recButton.setOnTouchListener(this);
+
         playButton = (Button) getView().findViewById(R.id.playButton);
-        playButton.setOnClickListener(this);
+        playButton.setOnTouchListener(this);
+        playButton.setOnLongClickListener(this);
+
+        loopSwitch = (Switch) getView().findViewById(R.id.loopSwitch);
+        loopSwitch.setOnTouchListener(this);
+
         speedAdjust = (SeekBar) getView().findViewById(R.id.speedAdjust);
         speedAdjust.setOnSeekBarChangeListener(this);
+
     }
 
 
@@ -138,26 +152,56 @@ public class LoopTrackFragment
     @Override
     public void onDetach() {
         super.onDetach();
+        if (soundPlayer != null)
+            soundPlayer.releaseResources();
+        if (recThread != null)
+            recThread.releaseResources();
         mListener = null;
     }
 
     @Override
-    public void onClick(View view) {
-        String tag = (String) view.getTag();
+    public boolean onTouch(View view, MotionEvent motionEvent) {
 
-        System.out.println(">>> " + tag);
+        if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
 
-        switch (tag) {
-            case "recButton":
-                controlRecording();
-                break;
-            case "playButton":
-                controlPlayback();
-                break;
-            default:
-                break;
+            String tag = (String) view.getTag();
+
+            System.out.println(">>> " + tag);
+
+            switch (tag) {
+                case "recButton":
+                    controlRecording();
+                    break;
+                case "playButton":
+                    controlPlayback();
+                    break;
+                case "loopSwitch":
+                    toggleLoop();
+                    break;
+                default:
+                    break;
+            }
         }
+        return false;
+    }
 
+    private void toggleLoop() {
+        isLoopMode = !isLoopMode;
+
+        System.out.println("isLoopMode = " + isLoopMode);
+
+        if (isLoopMode) {
+
+            EditText startBox = (EditText) getView().findViewById(R.id.loopStart);
+            EditText endBox = (EditText) getView().findViewById(R.id.loopEnd);
+
+            int loopStart = Integer.parseInt(startBox.getText().toString());
+            int loopEnd = Integer.parseInt(endBox.getText().toString());
+            soundPlayer.setToLoop(loopStart, loopEnd);
+        }
+        else {
+            soundPlayer.setToOneshot();
+        }
     }
 
     private void updateDisplay(Message msg) {
@@ -177,14 +221,12 @@ public class LoopTrackFragment
             nowRecording = true;
             recThread = new RecordingThread(bufferSize, sampleRate);
             recThread.start();
-            vibrate();
         } else if (!nowPlaying) {
             recButton.setBackgroundColor(Color.BLUE);
             playButton.setBackgroundColor(Color.BLUE);
             nowRecording = false;
             recThread.stopRecording();
             soundPlayer = null;
-            vibrate();
         }
     }
 
@@ -218,8 +260,17 @@ public class LoopTrackFragment
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-        if (soundPlayer != null)
-            soundPlayer.setPlaybackRate(i);
+        if (soundPlayer != null) {
+//            soundPlayer.setPlaybackRate(i);
+            PlaybackParams params = soundPlayer.getPlaybackParams();
+            if (params != null) {
+
+                // TODO make this configurable via long-press
+                params.setPitch((i / 100f));
+//            params.setSpeed(i/100f);
+                soundPlayer.setPlaybackParams(params);
+            }
+        }
     }
 
     @Override
@@ -230,6 +281,12 @@ public class LoopTrackFragment
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        System.out.println(">>> LONG CLICK!");
+        return false;
     }
 
 

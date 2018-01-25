@@ -3,6 +3,11 @@ package skot.sensormadness;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.Environment;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created by skot on 1/20/18.
@@ -24,11 +29,6 @@ public class RecordingThread extends Thread {
         for (int i = 0; i < bufferSize; i++) {
             buffer[i] = 0;
         }
-    }
-
-    public void run() {
-
-        System.out.println(">>> (REC) Start...");
 
         audioRecord = new AudioRecord(
                 MediaRecorder.AudioSource.MIC,
@@ -37,6 +37,11 @@ public class RecordingThread extends Thread {
                 AudioFormat.ENCODING_PCM_8BIT,
                 bufferSize
         );
+    }
+
+    public void run() {
+
+        System.out.println(">>> (REC) Start...");
 
         nowRecording = true;
         recordingStart = System.currentTimeMillis();
@@ -52,6 +57,28 @@ public class RecordingThread extends Thread {
         System.out.println(">>> recordingDuration = " + recordingDuration);
         audioRecord.stop();
         audioRecord.release();
+
+        dumpBytesToDisk(buffer);
+    }
+
+    private void dumpBytesToDisk(byte[] buffer) {
+
+        String fileName = "recBytes" + System.currentTimeMillis() + ".txt";
+
+        File file = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS), fileName);
+
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+                FileOutputStream fout = new FileOutputStream(file);
+                fout.write(buffer);
+                fout.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public synchronized void stopRecording() {
@@ -61,6 +88,16 @@ public class RecordingThread extends Thread {
 
     public byte [] getBuffer() {
         return buffer;
+    }
+
+    public void releaseResources() {
+        nowRecording = false;
+        if (audioRecord != null) {
+            audioRecord.release();
+            audioRecord = null;
+        }
+
+        buffer = null;
     }
 
 }

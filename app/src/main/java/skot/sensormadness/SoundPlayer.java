@@ -3,6 +3,7 @@ package skot.sensormadness;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.PlaybackParams;
 
 /**
  * Created by skot on 1/20/18.
@@ -13,6 +14,7 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
     private byte[] buffer;
     private int sampleRate;
     private AudioTrack audioTrack = null;
+    private boolean loopingMode = false;
     private PlaybackCompleteListener listener;
 
     public SoundPlayer(final PlaybackCompleteListener listener, final byte[] buffer, final int sampleRate) {
@@ -51,14 +53,22 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
         audioTrack.play();
     }
 
-    public void setToLoop() {
-        System.out.println(">>> SET TO LOOP");
-        audioTrack.setLoopPoints(0, buffer.length, -1);
+    public void setStartPosition(final int startPos) {
+        System.out.println("startPos = " + startPos);
+        audioTrack.setPlaybackHeadPosition(startPos);
+    }
+
+    public void setToLoop(final int startMarker, final int stopMarker) {
+        System.out.println(">>> SET TO LOOP START (" + startMarker + ") END (" + stopMarker + ")");
+        setStartPosition(startMarker);
+        audioTrack.setLoopPoints(startMarker, stopMarker, -1);
+        loopingMode = true;
     }
 
     public void setToOneshot() {
         System.out.println(">>> SET TO ONE-SHOT");
         audioTrack.setLoopPoints(0, buffer.length, 0);
+        loopingMode = false;
     }
 
     public synchronized void stopPlaying() {
@@ -66,11 +76,43 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
         audioTrack.release();
     }
 
+    private void analyzeSoundData() {
+        byte b;
+
+
+    }
+
+    public PlaybackParams getPlaybackParams() {
+        if (audioTrack != null) {
+            return audioTrack.getPlaybackParams();
+        }
+        return null;
+    }
+
+    public void setPlaybackParams(PlaybackParams params) {
+        if (audioTrack != null) {
+            audioTrack.setPlaybackParams(params);
+        }
+    }
+
+    public void releaseResources() {
+
+        if (audioTrack != null) {
+            audioTrack.stop();
+            audioTrack.release();
+            audioTrack = null;
+        }
+        buffer = null;
+    }
+
+
     @Override
     public void onMarkerReached(AudioTrack audioTrack) {
-        System.out.println(">>> MARKER!!!!");
-        audioTrack.stop();
-        listener.onPlaybackComplete();
+        if (!loopingMode) {
+            System.out.println(">>> MARKER!!!!");
+            audioTrack.stop();
+            listener.onPlaybackComplete();
+        }
     }
 
     @Override

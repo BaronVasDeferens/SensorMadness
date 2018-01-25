@@ -1,35 +1,39 @@
 package skot.sensormadness;
 
-import android.app.Fragment;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoopRecorderActivity extends AppCompatActivity implements LoopTrackFragment.OnFragmentInteractionListener {
 
-    LoopTrackFragment trackOne, trackTwo, trackThree;
+    List<LoopTrackFragment> loopTracks;
+    final int totalLoopTracks = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loop_recorder);
 
-        trackOne = new LoopTrackFragment();
-        trackTwo = new LoopTrackFragment();
-        trackThree = new LoopTrackFragment();
-
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction trans = fragmentManager.beginTransaction();
-        trans.add(R.id.mainLayout, trackOne);
-        trans.add(R.id.mainLayout, trackTwo);
-        trans.add(R.id.mainLayout, trackThree);
+
+//        if (fragmentManager.getFragments() != null) {
+//            for (Fragment frag : fragmentManager.getFragments()) {
+//                trans.remove(frag);
+//            }
+//            trans.commit();
+//        }
+
+        loopTracks = new ArrayList<>(totalLoopTracks);
+        for (int i = 0; i < totalLoopTracks; i++) {
+            LoopTrackFragment frag = new LoopTrackFragment();
+            loopTracks.add(frag);
+            trans.add(R.id.mainLayout, frag, Integer.toString(i));
+        }
 
         trans.commit();
     }
@@ -37,6 +41,11 @@ public class LoopRecorderActivity extends AppCompatActivity implements LoopTrack
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override
