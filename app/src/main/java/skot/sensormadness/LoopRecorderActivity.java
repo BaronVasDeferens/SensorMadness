@@ -21,13 +21,6 @@ public class LoopRecorderActivity extends AppCompatActivity implements LoopTrack
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction trans = fragmentManager.beginTransaction();
 
-//        if (fragmentManager.getFragments() != null) {
-//            for (Fragment frag : fragmentManager.getFragments()) {
-//                trans.remove(frag);
-//            }
-//            trans.commit();
-//        }
-
         loopTracks = new ArrayList<>(totalLoopTracks);
         for (int i = 0; i < totalLoopTracks; i++) {
             LoopTrackFragment frag = new LoopTrackFragment();

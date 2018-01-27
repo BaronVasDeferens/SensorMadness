@@ -15,6 +15,10 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
     private int sampleRate;
     private AudioTrack audioTrack = null;
     private boolean loopingMode = false;
+    private int playbackStart;
+    private int playbackEnd;
+    private int loopStart;
+    private int loopEnd;
     private PlaybackCompleteListener listener;
 
     public SoundPlayer(final PlaybackCompleteListener listener, final byte[] buffer, final int sampleRate) {
@@ -30,50 +34,61 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
                 this.buffer.length,
                 AudioTrack.MODE_STATIC);
 
+        playbackStart = 0;
+        playbackEnd = buffer.length - 1;
+        loopStart = 0;
+        loopEnd = buffer.length - 1;
+
         audioTrack.setPlaybackPositionUpdateListener(this);
     }
 
     public void init() {
         audioTrack.write(buffer, 0, buffer.length);
-        audioTrack.setPlaybackHeadPosition(0);
-        audioTrack.setNotificationMarkerPosition(buffer.length);
+        reset();
+    }
+
+    private void reset() {
+        audioTrack.setPlaybackHeadPosition(playbackStart);
+        audioTrack.setNotificationMarkerPosition(playbackEnd);
+        audioTrack.setLoopPoints(loopStart, loopEnd, loopingMode ? -1 : 0);
     }
 
     public synchronized void setPlaybackRate(int percent) {
-        sampleRate = (int)(44100 * ((float) percent / 100f));
+        sampleRate = (int) (44100 * ((float) percent / 100f));
         audioTrack.setPlaybackRate(sampleRate);
     }
 
     public void playSound() {
-        if (audioTrack.getPlaybackHeadPosition() > 0) {
-            audioTrack.stop();
-            audioTrack.setPlaybackHeadPosition(0);
+        if (audioTrack.getPlaybackHeadPosition() >= playbackStart) {
+            audioTrack.pause();
+            audioTrack.flush();
+            reset();
         }
 
         audioTrack.play();
     }
 
-    public void setStartPosition(final int startPos) {
-        System.out.println("startPos = " + startPos);
-        audioTrack.setPlaybackHeadPosition(startPos);
-    }
-
-    public void setToLoop(final int startMarker, final int stopMarker) {
-        System.out.println(">>> SET TO LOOP START (" + startMarker + ") END (" + stopMarker + ")");
-        setStartPosition(startMarker);
-        audioTrack.setLoopPoints(startMarker, stopMarker, -1);
+    public void setToLoop(final int loopStart, final int loopEnd) {
+        this.loopStart = loopStart;
+        this.loopEnd = loopEnd;
+        System.out.println(">>> SET TO LOOP START (" + loopStart + ") END (" + loopEnd + ")");
         loopingMode = true;
+        reset();
     }
 
     public void setToOneshot() {
         System.out.println(">>> SET TO ONE-SHOT");
-        audioTrack.setLoopPoints(0, buffer.length, 0);
+        loopStart = 0;
+        loopEnd = buffer.length - 1;
+        reset();
         loopingMode = false;
     }
 
+
     public synchronized void stopPlaying() {
-        audioTrack.stop();
-        audioTrack.release();
+        audioTrack.pause();
+        audioTrack.flush();
+        reset();
     }
 
     private void analyzeSoundData() {
@@ -83,10 +98,7 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
     }
 
     public PlaybackParams getPlaybackParams() {
-        if (audioTrack != null) {
-            return audioTrack.getPlaybackParams();
-        }
-        return null;
+        return audioTrack.getPlaybackParams();
     }
 
     public void setPlaybackParams(PlaybackParams params) {
@@ -102,6 +114,7 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
             audioTrack.release();
             audioTrack = null;
         }
+
         buffer = null;
     }
 
@@ -109,8 +122,7 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
     @Override
     public void onMarkerReached(AudioTrack audioTrack) {
         if (!loopingMode) {
-            System.out.println(">>> MARKER!!!!");
-            audioTrack.stop();
+            System.out.println(">>> MARKER REACHED (" + playbackEnd + ")");
             listener.onPlaybackComplete();
         }
     }

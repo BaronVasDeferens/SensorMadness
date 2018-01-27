@@ -52,6 +52,7 @@ public class LoopTrackFragment
     Switch loopSwitch;
     SeekBar speedAdjust;
     EditText startLoop, stopLoop;
+
     private boolean nowRecording = false;
     private boolean nowPlaying = false;
     private boolean isLoopMode = false;
@@ -115,12 +116,15 @@ public class LoopTrackFragment
     @Override
     public void onViewCreated(View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
+
         recButton = (Button) getView().findViewById(R.id.recButton);
         recButton.setOnTouchListener(this);
+        enableButton(recButton);
 
         playButton = (Button) getView().findViewById(R.id.playButton);
         playButton.setOnTouchListener(this);
         playButton.setOnLongClickListener(this);
+        disableButton(playButton);
 
         loopSwitch = (Switch) getView().findViewById(R.id.loopSwitch);
         loopSwitch.setOnTouchListener(this);
@@ -166,8 +170,6 @@ public class LoopTrackFragment
 
             String tag = (String) view.getTag();
 
-            System.out.println(">>> " + tag);
-
             switch (tag) {
                 case "recButton":
                     controlRecording();
@@ -185,45 +187,19 @@ public class LoopTrackFragment
         return false;
     }
 
-    private void toggleLoop() {
-        isLoopMode = !isLoopMode;
-
-        System.out.println("isLoopMode = " + isLoopMode);
-
-        if (isLoopMode) {
-
-            EditText startBox = (EditText) getView().findViewById(R.id.loopStart);
-            EditText endBox = (EditText) getView().findViewById(R.id.loopEnd);
-
-            int loopStart = Integer.parseInt(startBox.getText().toString());
-            int loopEnd = Integer.parseInt(endBox.getText().toString());
-            soundPlayer.setToLoop(loopStart, loopEnd);
-        }
-        else {
-            soundPlayer.setToOneshot();
-        }
-    }
-
-    private void updateDisplay(Message msg) {
-
-    }
-
-    private void vibrate() {
-        Vibrator steelyDan = (Vibrator) getActivity().getSystemService(VIBRATOR_SERVICE);
-        steelyDan.vibrate(200);
-    }
 
     private void controlRecording() {
 
         if ((!nowRecording) && (!nowPlaying)) {
-            recButton.setBackgroundColor(Color.RED);
-            playButton.setBackgroundColor(Color.GRAY);
+            speedAdjust.setProgress(100);
+            enableButtonActive(recButton);
+            disableButton(playButton);
             nowRecording = true;
             recThread = new RecordingThread(bufferSize, sampleRate);
             recThread.start();
         } else if (!nowPlaying) {
-            recButton.setBackgroundColor(Color.BLUE);
-            playButton.setBackgroundColor(Color.BLUE);
+            enableButton(recButton);
+            enableButton(playButton);
             nowRecording = false;
             recThread.stopRecording();
             soundPlayer = null;
@@ -245,17 +221,71 @@ public class LoopTrackFragment
                 soundPlayer.init();
             }
 
-            recButton.setBackgroundColor(Color.GRAY);
-            playButton.setBackgroundColor(Color.RED);
+            disableButton(recButton);
+            enableButtonActive(playButton);
+            nowPlaying = true;
             soundPlayer.playSound();
             vibrate();
+        } else if (nowPlaying && !isLoopMode) {
+            // Re-trigger the sound from the beginning
+            disableButton(recButton);
+            soundPlayer.playSound();
+            vibrate();
+        } else if (nowPlaying && isLoopMode) {
+            enableButton(recButton);
+            enableButton(playButton);
+            nowPlaying = false;
+            soundPlayer.stopPlaying();
         }
+    }
+
+    private void toggleLoop() {
+        isLoopMode = !isLoopMode;
+
+        System.out.println("isLoopMode = " + isLoopMode);
+
+        if (isLoopMode) {
+
+            EditText startBox = (EditText) getView().findViewById(R.id.loopStart);
+            EditText endBox = (EditText) getView().findViewById(R.id.loopEnd);
+
+            int loopStart = Integer.parseInt(startBox.getText().toString());
+            int loopEnd = Integer.parseInt(endBox.getText().toString());
+            soundPlayer.setToLoop(loopStart, loopEnd);
+        } else {
+            soundPlayer.setToOneshot();
+        }
+    }
+
+    private void updateDisplay(Message msg) {
+
+    }
+
+    private void vibrate() {
+        Vibrator steelyDan = (Vibrator) getActivity().getSystemService(VIBRATOR_SERVICE);
+        steelyDan.vibrate(200);
+    }
+
+    private void disableButton(final Button button) {
+        button.setBackgroundColor(Color.GRAY);
+        button.setClickable(false);
+    }
+
+    private void enableButton(final Button button) {
+        button.setBackgroundColor(Color.BLUE);
+        button.setClickable(true);
+    }
+
+    private void enableButtonActive(final Button button) {
+        button.setBackgroundColor(Color.RED);
+        button.setClickable(true);
     }
 
     @Override
     public void onPlaybackComplete() {
         nowPlaying = false;
-        playButton.setBackgroundColor(Color.BLUE);
+        enableButton(playButton);
+        enableButton(recButton);
     }
 
     @Override
