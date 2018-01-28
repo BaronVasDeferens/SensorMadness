@@ -59,11 +59,10 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
     }
 
     public void playSound() {
-        if (audioTrack.getPlaybackHeadPosition() >= playbackStart) {
-            audioTrack.pause();
-            reset();
-        }
 
+        System.out.println(">>> SoundPlayer.playSound()...");
+        audioTrack.pause();
+        reset();
         audioTrack.play();
     }
 
