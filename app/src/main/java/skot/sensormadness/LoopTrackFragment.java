@@ -3,6 +3,7 @@ package skot.sensormadness;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Color;
+import android.media.AudioRecord;
 import android.media.PlaybackParams;
 import android.net.Uri;
 import android.os.Bundle;
@@ -52,6 +53,7 @@ public class LoopTrackFragment
     Switch loopSwitch;
     SeekBar speedAdjust;
     EditText startLoop, stopLoop;
+    DataGraphView dataGraphView;
 
     private boolean nowRecording = false;
     private boolean nowPlaying = false;
@@ -132,6 +134,8 @@ public class LoopTrackFragment
         speedAdjust = (SeekBar) getView().findViewById(R.id.speedAdjust);
         speedAdjust.setOnSeekBarChangeListener(this);
 
+        dataGraphView = (DataGraphView) getView().findViewById(R.id.dataGraph);
+
     }
 
 
@@ -156,7 +160,7 @@ public class LoopTrackFragment
     @Override
     public void onDetach() {
         super.onDetach();
-        System.out.println(">>> RELASING RESOURCES...");
+        System.out.println(">>> RELEASING RESOURCES...");
         if (soundPlayer != null)
             soundPlayer.releaseResources();
         if (recThread != null)
@@ -196,13 +200,14 @@ public class LoopTrackFragment
             enableButtonActive(recButton);
             disableButton(playButton);
             nowRecording = true;
-            recThread = new RecordingThread(bufferSize, sampleRate);
+            recThread = new RecordingThread(bufferSize, sampleRate, handler);
             recThread.start();
         } else if (!nowPlaying) {
             enableButton(recButton);
             enableButton(playButton);
             nowRecording = false;
             recThread.stopRecording();
+            dataGraphView.setData(recThread.getBuffer());
             soundPlayer = null;
         }
     }
@@ -260,7 +265,9 @@ public class LoopTrackFragment
     }
 
     private void updateDisplay(Message msg) {
-
+        RecordingThread recordingThread = (RecordingThread) msg.obj;
+        dataGraphView.setData(recordingThread.getBuffer());
+        dataGraphView.invalidate();
     }
 
     private void vibrate() {
@@ -293,15 +300,16 @@ public class LoopTrackFragment
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
         if (soundPlayer != null) {
-//            soundPlayer.setPlaybackRate(i);
-            PlaybackParams params = soundPlayer.getPlaybackParams();
-            if (params != null) {
+            soundPlayer.setPlaybackRate(i);
 
-                // TODO make this configurable via long-press
-                params.setPitch((i / 100f));
-//            params.setSpeed(i/100f);
-                soundPlayer.setPlaybackParams(params);
-            }
+//            PlaybackParams params = soundPlayer.getPlaybackParams();
+//            if (params != null) {
+//
+//                // TODO make this configurable via long-press
+//                params.setPitch((i / 100f));
+//                params.setSpeed(i / 100f);
+//                soundPlayer.setPlaybackParams(params);
+//            }
         }
     }
 

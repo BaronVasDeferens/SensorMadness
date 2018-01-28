@@ -47,7 +47,8 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
         reset();
     }
 
-    private void reset() {
+    private synchronized void reset() {
+        audioTrack.pause();
         audioTrack.setPlaybackHeadPosition(playbackStart);
         audioTrack.setNotificationMarkerPosition(playbackEnd);
         audioTrack.setLoopPoints(loopStart, loopEnd, loopingMode ? -1 : 0);
@@ -58,7 +59,7 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
         audioTrack.setPlaybackRate(sampleRate);
     }
 
-    public void playSound() {
+    public synchronized void playSound() {
 
         System.out.println(">>> SoundPlayer.playSound()...");
         audioTrack.pause();
@@ -94,11 +95,11 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
 
     }
 
-    public PlaybackParams getPlaybackParams() {
+    public synchronized PlaybackParams getPlaybackParams() {
         return audioTrack.getPlaybackParams();
     }
 
-    public void setPlaybackParams(PlaybackParams params) {
+    public synchronized void setPlaybackParams(PlaybackParams params) {
         if (audioTrack != null) {
             audioTrack.setPlaybackParams(params);
         }

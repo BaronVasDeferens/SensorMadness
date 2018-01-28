@@ -75,6 +75,12 @@
                 android:layout_margin="10sp"
                 android:background="@color/white"/>
 
+            <skot.sensormadness.DataGraphView
+                android:id="@+id/dataGraph"
+                android:layout_width="200sp"
+                android:layout_height="75sp">
+            </skot.sensormadness.DataGraphView>
+
         </LinearLayout>
 
     </LinearLayout>

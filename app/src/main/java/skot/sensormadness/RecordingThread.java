@@ -4,6 +4,8 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,12 +22,15 @@ public class RecordingThread extends Thread {
     private final int bufferSize;
     private final int sampleRate;
     private long recordingStart, recordingStop, recordingDuration = 0;
+    private Handler handler;
 
-    public RecordingThread(final int bufferSize, final int sampleRate) {
+    public RecordingThread(final int bufferSize, final int sampleRate, final Handler handler) {
         this.sampleRate = sampleRate;
         this.bufferSize = bufferSize;
+        this.handler = handler;
 
         buffer = new byte [bufferSize];
+
         for (int i = 0; i < bufferSize; i++) {
             buffer[i] = 0;
         }
@@ -56,9 +61,15 @@ public class RecordingThread extends Thread {
         recordingDuration = recordingStop - recordingStart;
         System.out.println(">>> recordingDuration = " + recordingDuration);
         audioRecord.stop();
-        audioRecord.release();
+
+
+        Message msg = Message.obtain();
+        msg.obj = this;
+        handler.sendMessage(msg);
 
         dumpBytesToDisk(buffer);
+
+        //releaseResources();
     }
 
     private void dumpBytesToDisk(byte[] buffer) {
