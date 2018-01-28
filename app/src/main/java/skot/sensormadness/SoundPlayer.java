@@ -61,7 +61,6 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
     public void playSound() {
         if (audioTrack.getPlaybackHeadPosition() >= playbackStart) {
             audioTrack.pause();
-            audioTrack.flush();
             reset();
         }
 
@@ -87,7 +86,6 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
 
     public synchronized void stopPlaying() {
         audioTrack.pause();
-        audioTrack.flush();
         reset();
     }
 

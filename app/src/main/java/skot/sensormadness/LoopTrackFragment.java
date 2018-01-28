@@ -156,6 +156,7 @@ public class LoopTrackFragment
     @Override
     public void onDetach() {
         super.onDetach();
+        System.out.println(">>> RELASING RESOURCES...");
         if (soundPlayer != null)
             soundPlayer.releaseResources();
         if (recThread != null)
@@ -231,7 +232,8 @@ public class LoopTrackFragment
             disableButton(recButton);
             soundPlayer.playSound();
             vibrate();
-        } else if (nowPlaying && isLoopMode) {
+        } else if (nowPlaying) {
+            // Looping player stops when pressed again
             enableButton(recButton);
             enableButton(playButton);
             nowPlaying = false;
