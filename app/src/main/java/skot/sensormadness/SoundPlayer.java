@@ -68,6 +68,19 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
         audioTrack.play();
     }
 
+    public void setSampleStart(final float percentPosition) {
+        playbackStart = (int)(percentPosition * buffer.length);
+        System.out.println("percentPosition = " + percentPosition);
+        System.out.println("playbackStart = " + playbackStart);
+        reset();
+    }
+
+    public void setLoopStart(final float percentPosition) {
+        loopingMode = true;
+        this.loopStart = (int)(percentPosition * buffer.length);
+        audioTrack.setPlaybackHeadPosition((int)(percentPosition * buffer.length));
+    }
+
     public void setToLoop(final int loopStart, final int loopEnd) {
         this.loopStart = loopStart;
         this.loopEnd = loopEnd;

@@ -41,6 +41,12 @@ public class LoopTrackFragment
 
     public static final int EVENT_STOPPED_PLAYING = 1;
 
+    public enum SeekBarMode {
+        PLAYBACK_RATE, LOOP_START, LOOP_END, SAMPLE_START, SAMPLE_END
+    };
+
+    private SeekBarMode currentSeekBarMode = SeekBarMode.SAMPLE_START;
+
     Handler handler;
 
     RecordingThread recThread = null;
@@ -192,7 +198,6 @@ public class LoopTrackFragment
         return false;
     }
 
-
     private void controlRecording() {
 
         if ((!nowRecording) && (!nowPlaying)) {
@@ -225,7 +230,7 @@ public class LoopTrackFragment
             if (soundPlayer == null) {
                 soundPlayer = new SoundPlayer(this, recThread.getBuffer(), sampleRate);
                 soundPlayer.init();
-
+                dataGraphView.setMarkerPosition(0);
             }
 
             disableButton(recButton);
@@ -246,6 +251,36 @@ public class LoopTrackFragment
             nowPlaying = false;
             soundPlayer.stopPlaying();
         }
+    }
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+        switch (currentSeekBarMode) {
+            case PLAYBACK_RATE:
+                if (soundPlayer != null)
+                    soundPlayer.setPlaybackRate(i / 50f);
+
+                dataGraphView.setMarkerPosition(0);
+                dataGraphView.invalidate();
+                break;
+            case LOOP_START:
+                if (soundPlayer != null) {
+                    soundPlayer.setLoopStart(i / 50f);
+                    loopSwitch.setChecked(true);
+                }
+                dataGraphView.setMarkerPosition(i);
+                dataGraphView.invalidate();
+                break;
+            case SAMPLE_START:
+                if (soundPlayer != null) {
+                    soundPlayer.setSampleStart(i/100f);
+                }
+                dataGraphView.setMarkerPosition(i);
+                dataGraphView.invalidate();
+            default:
+                break;
+        }
+
     }
 
     private void toggleLoop() {
@@ -297,16 +332,6 @@ public class LoopTrackFragment
         nowPlaying = false;
         enableButton(playButton);
         enableButton(recButton);
-    }
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-        if (soundPlayer != null) {
-            soundPlayer.setPlaybackRate(i/50f);
-        }
-
-        dataGraphView.setMarkerPosition(i);
-        dataGraphView.invalidate();
     }
 
     @Override
