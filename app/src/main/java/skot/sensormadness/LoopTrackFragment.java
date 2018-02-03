@@ -196,7 +196,7 @@ public class LoopTrackFragment
     private void controlRecording() {
 
         if ((!nowRecording) && (!nowPlaying)) {
-            speedAdjust.setProgress(100);
+            speedAdjust.setProgress(50);
             enableButtonActive(recButton);
             disableButton(playButton);
             nowRecording = true;
@@ -225,12 +225,14 @@ public class LoopTrackFragment
             if (soundPlayer == null) {
                 soundPlayer = new SoundPlayer(this, recThread.getBuffer(), sampleRate);
                 soundPlayer.init();
+
             }
 
             disableButton(recButton);
             enableButtonActive(playButton);
             nowPlaying = true;
             soundPlayer.playSound();
+            dataGraphView.invalidate();
             vibrate();
         } else if (nowPlaying && !isLoopMode) {
             // Re-trigger the sound from the beginning
@@ -300,17 +302,11 @@ public class LoopTrackFragment
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
         if (soundPlayer != null) {
-            soundPlayer.setPlaybackRate(i);
-
-//            PlaybackParams params = soundPlayer.getPlaybackParams();
-//            if (params != null) {
-//
-//                // TODO make this configurable via long-press
-//                params.setPitch((i / 100f));
-//                params.setSpeed(i / 100f);
-//                soundPlayer.setPlaybackParams(params);
-//            }
+            soundPlayer.setPlaybackRate(i/50f);
         }
+
+        dataGraphView.setMarkerPosition(i);
+        dataGraphView.invalidate();
     }
 
     @Override

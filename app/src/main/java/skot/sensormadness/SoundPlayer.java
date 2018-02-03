@@ -54,8 +54,9 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
         audioTrack.setLoopPoints(loopStart, loopEnd, loopingMode ? -1 : 0);
     }
 
-    public synchronized void setPlaybackRate(int percent) {
-        sampleRate = (int) (44100 * ((float) percent / 100f));
+    public synchronized void setPlaybackRate(final float percent) {
+        sampleRate = (int) (44100 * percent);
+        System.out.println("sampleRate = " + sampleRate);
         audioTrack.setPlaybackRate(sampleRate);
     }
 
