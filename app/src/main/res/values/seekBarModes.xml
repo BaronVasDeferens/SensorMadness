@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="seekBarModes">
+        <item>SAMPLE_START</item>
+        <item>SAMPLE_END</item>
+        <item>LOOP_START</item>
+        <item>LOOP_END</item>
+        <item>SAMPLE_RATE</item>
+    </string-array>
+</resources>

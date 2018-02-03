@@ -30,6 +30,13 @@
             android:text="PLAY"
             android:tag="playButton"/>
 
+        <Spinner
+            android:id="@+id/seekBarMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </Spinner>
+
         <SeekBar
             android:layout_width="300sp"
             android:layout_height="50sp"

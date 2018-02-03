@@ -16,9 +16,12 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.Switch;
 
 import static android.content.Context.VIBRATOR_SERVICE;
@@ -35,15 +38,18 @@ import static android.content.Context.VIBRATOR_SERVICE;
 public class LoopTrackFragment
         extends android.support.v4.app.Fragment
         implements View.OnTouchListener,
-        PlaybackCompleteListener, SeekBar.OnSeekBarChangeListener, View.OnLongClickListener
+        PlaybackCompleteListener, SeekBar.OnSeekBarChangeListener, View.OnLongClickListener, AdapterView.OnItemSelectedListener
 
 {
 
     public static final int EVENT_STOPPED_PLAYING = 1;
 
+
     public enum SeekBarMode {
-        PLAYBACK_RATE, LOOP_START, LOOP_END, SAMPLE_START, SAMPLE_END
-    };
+        SAMPLE_RATE, LOOP_START, LOOP_END, SAMPLE_START, SAMPLE_END
+    }
+
+
 
     private SeekBarMode currentSeekBarMode = SeekBarMode.SAMPLE_START;
 
@@ -56,6 +62,7 @@ public class LoopTrackFragment
     private final int bufferSize = 50000;
 
     Button recButton, playButton;
+    Spinner seekBarModeSelect;
     Switch loopSwitch;
     SeekBar speedAdjust;
     EditText startLoop, stopLoop;
@@ -134,6 +141,16 @@ public class LoopTrackFragment
         playButton.setOnLongClickListener(this);
         disableButton(playButton);
 
+        seekBarModeSelect = (Spinner) getView().findViewById(R.id.seekBarMode);
+        seekBarModeSelect.setOnItemSelectedListener(this);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.seekBarModes, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        seekBarModeSelect.setAdapter(adapter);
+
         loopSwitch = (Switch) getView().findViewById(R.id.loopSwitch);
         loopSwitch.setOnTouchListener(this);
 
@@ -141,7 +158,6 @@ public class LoopTrackFragment
         speedAdjust.setOnSeekBarChangeListener(this);
 
         dataGraphView = (DataGraphView) getView().findViewById(R.id.dataGraph);
-
     }
 
 
@@ -252,11 +268,12 @@ public class LoopTrackFragment
             soundPlayer.stopPlaying();
         }
     }
+
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
 
         switch (currentSeekBarMode) {
-            case PLAYBACK_RATE:
+            case SAMPLE_RATE:
                 if (soundPlayer != null)
                     soundPlayer.setPlaybackRate(i / 50f);
 
@@ -273,13 +290,27 @@ public class LoopTrackFragment
                 break;
             case SAMPLE_START:
                 if (soundPlayer != null) {
-                    soundPlayer.setSampleStart(i/100f);
+                    soundPlayer.setSampleStart(i / 100f);
                 }
                 dataGraphView.setMarkerPosition(i);
                 dataGraphView.invalidate();
             default:
                 break;
         }
+
+    }
+
+    // Spinner
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        final String selectedMode = (String) parent.getItemAtPosition(position);
+        currentSeekBarMode = SeekBarMode.valueOf(selectedMode);
+        System.out.println("currentSeekBarMode = " + currentSeekBarMode);
+    }
+
+    // Spinner
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
     }
 
