@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="seekBarModes">
+        <item>VOLUME</item>
         <item>SAMPLE_START</item>
         <item>SAMPLE_END</item>
         <item>LOOP_START</item>

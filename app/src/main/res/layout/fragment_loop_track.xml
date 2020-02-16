@@ -8,9 +8,9 @@
         android:layout_width="match_parent"
         android:layout_height="100sp"
         android:background="@color/colorAccent"
-        android:visibility="visible"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:visibility="visible">
 
         <Button
             android:id="@+id/recButton"
@@ -18,8 +18,8 @@
             android:layout_height="75sp"
             android:layout_margin="10sp"
             android:background="@color/colorPrimary"
-            android:text="REC"
-            android:tag="recButton"/>
+            android:tag="recButton"
+            android:text="REC" />
 
         <Button
             android:id="@+id/playButton"
@@ -27,71 +27,45 @@
             android:layout_height="75sp"
             android:layout_margin="10sp"
             android:background="@color/colorPrimary"
-            android:text="PLAY"
-            android:tag="playButton"/>
+            android:tag="playButton"
+            android:text="PLAY" />
 
         <Spinner
-            android:id="@+id/seekBarMode"
+            android:id="@+id/seekBarModeSpinner"
+            android:tag="seekBarMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
         </Spinner>
 
         <SeekBar
+            android:id="@+id/speedAdjust"
             android:layout_width="300sp"
             android:layout_height="50sp"
             android:layout_margin="10sp"
-            android:id="@+id/speedAdjust"
-            android:tag="speedAdjust"
             android:background="@color/colorPrimary"
-            android:progress="50"
             android:max="100"
-            />
+            android:progress="50"
+            android:tag="speedAdjust" />
 
         <Switch
             android:id="@+id/loopSwitch"
-            android:tag="loopSwitch"
-            android:text="LOOP"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10sp"
-            android:textColorHighlight="@color/colorPrimaryDark"/>
+            android:tag="loopSwitch"
+            android:text="LOOP"
+            android:textColorHighlight="@color/colorPrimaryDark" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:id="@+id/loopMarkers">
 
-            <EditText
+        <skot.sensormadness.DataGraphView
+            android:id="@+id/dataGraph"
+            android:layout_width="200sp"
+            android:layout_height="75sp">
+        </skot.sensormadness.DataGraphView>
 
-                android:id="@+id/loopStart"
-                android:text="0"
-                android:inputType="number"
-                android:layout_width="50sp"
-                android:layout_height="wrap_content"
-                android:layout_margin="10sp"
-                android:background="@color/white"
-/>
-            <EditText
-                android:id="@+id/loopEnd"
-                android:inputType="number"
-                android:text="50000"
-                android:layout_width="50sp"
-                android:layout_height="wrap_content"
-                android:layout_margin="10sp"
-                android:background="@color/white"/>
-
-            <skot.sensormadness.DataGraphView
-                android:id="@+id/dataGraph"
-                android:layout_width="200sp"
-                android:layout_height="75sp">
-            </skot.sensormadness.DataGraphView>
-
-        </LinearLayout>
 
     </LinearLayout>
-
 
 
 </FrameLayout>

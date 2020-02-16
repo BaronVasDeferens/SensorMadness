@@ -68,6 +68,11 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
         audioTrack.play();
     }
 
+
+    public void setVolume(float v) {
+        audioTrack.setVolume(v);
+    }
+
     public void setSampleStart(final float percentPosition) {
         playbackStart = (int)(percentPosition * buffer.length);
         System.out.println("percentPosition = " + percentPosition);
@@ -77,14 +82,20 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
 
     public void setLoopStart(final float percentPosition) {
         loopingMode = true;
-        this.loopStart = (int)(percentPosition * buffer.length);
-        audioTrack.setPlaybackHeadPosition((int)(percentPosition * buffer.length));
+        loopStart = (int)(percentPosition * buffer.length);
+        setSampleStart(loopStart);
+        //audioTrack.setPlaybackHeadPosition((int)(percentPosition * buffer.length));
+        reset();
     }
 
-    public void setToLoop(final int loopStart, final int loopEnd) {
-        this.loopStart = loopStart;
-        this.loopEnd = loopEnd;
-        System.out.println(">>> SET TO LOOP START (" + loopStart + ") END (" + loopEnd + ")");
+    public void setLoopEnd(final float percentPosition) {
+        loopingMode = true;
+        this.loopEnd = (int)(percentPosition * buffer.length);
+        reset();
+    }
+
+
+    public void setToLoop() {
         loopingMode = true;
         reset();
     }
@@ -101,12 +112,6 @@ public class SoundPlayer implements AudioTrack.OnPlaybackPositionUpdateListener 
     public synchronized void stopPlaying() {
         audioTrack.pause();
         reset();
-    }
-
-    private void analyzeSoundData() {
-        byte b;
-
-
     }
 
     public synchronized PlaybackParams getPlaybackParams() {

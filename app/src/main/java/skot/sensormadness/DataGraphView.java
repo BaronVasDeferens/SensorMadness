@@ -87,7 +87,7 @@ public class DataGraphView extends View {
         if (renderedBitmap == null) {
 
             tempCanvas.drawColor(Color.WHITE);
-            paint.setColor(Color.BLUE);
+            paint.setColor(Color.LTGRAY);
             paint.setStyle(Paint.Style.FILL_AND_STROKE);
 
             int interval = data.length / myRect.width();
